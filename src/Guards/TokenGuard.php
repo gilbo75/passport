@@ -4,23 +4,24 @@ namespace Laravel\Passport\Guards;
 
 use Exception;
 use Firebase\JWT\JWT;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Contracts\Encryption\Encrypter;
-use Illuminate\Cookie\CookieValuePrefix;
-use Illuminate\Cookie\Middleware\EncryptCookies;
+use Firebase\JWT\Key;
 use Illuminate\Http\Request;
-use Laminas\Diactoros\ResponseFactory;
-use Laminas\Diactoros\ServerRequestFactory;
-use Laminas\Diactoros\StreamFactory;
-use Laminas\Diactoros\UploadedFileFactory;
-use Laravel\Passport\ClientRepository;
 use Laravel\Passport\Passport;
-use Laravel\Passport\PassportUserProvider;
-use Laravel\Passport\TokenRepository;
+use Illuminate\Container\Container;
+use Laminas\Diactoros\StreamFactory;
 use Laravel\Passport\TransientToken;
-use League\OAuth2\Server\Exception\OAuthServerException;
+use Laravel\Passport\TokenRepository;
+use Laminas\Diactoros\ResponseFactory;
+use Laravel\Passport\ClientRepository;
+use Illuminate\Cookie\CookieValuePrefix;
 use League\OAuth2\Server\ResourceServer;
+use Laminas\Diactoros\UploadedFileFactory;
+use Laravel\Passport\PassportUserProvider;
+use Laminas\Diactoros\ServerRequestFactory;
+use Illuminate\Contracts\Encryption\Encrypter;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use League\OAuth2\Server\Exception\OAuthServerException;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 
 class TokenGuard
@@ -272,8 +273,7 @@ class TokenGuard
     {
         return (array) JWT::decode(
             CookieValuePrefix::remove($this->encrypter->decrypt($request->cookie(Passport::cookie()), Passport::$unserializesCookies)),
-            $this->encrypter->getKey(),
-            ['HS256']
+            new Key($this->encrypter->getKey(), 'HS256')
         );
     }
 
